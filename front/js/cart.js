@@ -4,7 +4,7 @@ BASE_URL = `http://localhost:3000/api/products/`;
 let items = document.getElementById('cart__items');
 
 const start =
-    () => {
+    async () => {
         // calls the local storage
         for (let product of getCart()) {
             // introduces the elements in the html
@@ -17,7 +17,7 @@ const start =
                  <div class="cart__item__content__description">
                    <h2>${product.name}</h2>
                    <p>${product.color}</p>
-                   <p>${product.price}</p>
+                   <p>${await priceProduct(product.id)}</p>
                  </div>
                  <div class="cart__item__content__settings">
                    <div class="cart__item__content__settings__quantity">
@@ -33,6 +33,7 @@ const start =
             )
         }
         getElementsInCart();
+        refreshTotalPriceAndQtt();
     }
 // wait the page to load
 window.addEventListener('load', start);
@@ -94,6 +95,7 @@ function changeQuantity(product) {
             removeFromCart(foundProduct);
         } else {
             saveCart(cart);
+            refreshTotalPriceAndQtt();
         }
     }
 }
@@ -103,10 +105,41 @@ function removeFromCart(product) {
     let cart = getCart();
     cart = cart.filter(p => p.color !== product.color, p => p.id !== product.id);
     saveCart(cart);
+    refreshTotalPriceAndQtt()
     product.event.target.closest("article").remove();
 }
 
 // allows to save the changes in the local Storage
 function saveCart(cart) {
     localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+// call the api to get the real price of the product
+async function priceProduct(productId) {
+    let productPrice;
+
+    await fetch(BASE_URL + productId).then((response) =>
+        response.json().then((product) => {
+            productPrice = product.price;
+        })
+    );
+
+    return productPrice;
+}
+
+// calculates the total price of the cart and the total number of products
+async function refreshTotalPriceAndQtt() {
+    let cart = getCart(),
+        totalPrice = 0,
+        totalQuantity = 0;
+
+    // look in local storage and calculate
+    for (let product of cart) {
+        totalPrice += product.quantity * await priceProduct(product.id);
+        totalQuantity += product.quantity;
+    }
+
+    // display result
+    document.querySelector("#totalPrice").textContent = totalPrice;
+    document.querySelector("#totalQuantity").textContent = totalQuantity;
 }
