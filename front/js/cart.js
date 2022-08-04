@@ -195,7 +195,7 @@ form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (formValidity) {
         if (productId.length > 0) {
-            // TODO to order
+            toOrder();
         } else {
             alert('Votre panier est vide');
         }
@@ -224,4 +224,37 @@ function formValidation(textInput, id, text, RegExp) {
 // display error messages under inputs
 function displayMsgError(msg, id) {
     document.querySelector(id).textContent = msg;
+}
+
+// send the command and the form to the API
+function toOrder() {
+    // set up data to send
+    const contact = {
+        contact: {
+            firstName: form.firstName.value,
+            lastName: form.lastName.value,
+            address: form.address.value,
+            city: form.city.value,
+            email: form.email.value,
+        },
+         products: productId,
+    };
+    // send data
+    fetch(BASE_URL + 'order', {
+        method: 'POST',
+        body: JSON.stringify(contact),
+        headers: {"Content-Type": "application/json"}
+    }).then((blob) =>
+        blob.json().then((data) => {
+            // API response check
+            if (blob.ok) {
+                // response good deletion of the basket and redirection with orderId
+                localStorage.removeItem("cart");
+                window.location.assign("../html/confirmation.html?id=" + data.orderId);
+            } else {
+                // if error redirect with error code
+                window.location.assign("../html/confirmation.html?error=" + blob.status + ' ' + blob.statusText);
+            }
+        })
+    );
 }
