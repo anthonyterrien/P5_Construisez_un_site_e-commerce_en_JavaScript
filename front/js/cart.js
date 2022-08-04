@@ -1,7 +1,12 @@
 BASE_URL = `http://localhost:3000/api/products/`;
 
 // search ID cart__items in the html
-let items = document.getElementById('cart__items');
+let items = document.getElementById('cart__items'),
+    // search class cart__order__form in the html
+    form = document.querySelector('.cart__order__form'),
+
+    formValidity = true,
+    productId = [];
 
 const start =
     async () => {
@@ -31,6 +36,7 @@ const start =
               </div>
             </article>`
             )
+            productId.push(product.id);
         }
         getElementsInCart();
         refreshTotalPriceAndQtt();
@@ -142,4 +148,80 @@ async function refreshTotalPriceAndQtt() {
     // display result
     document.querySelector("#totalPrice").textContent = totalPrice;
     document.querySelector("#totalQuantity").textContent = totalQuantity;
+}
+
+// listen for changes to input fields
+form.firstName.addEventListener("change", function () {
+    formValidation(form.firstName.value,
+        '#' + form.firstName.id + 'ErrorMsg',
+        "Prénom",
+        /^(?=.{3,40}$)[a-z]+(?:['_.\s][a-z]+)*$/i);
+});
+
+// listen for changes to input fields
+form.lastName.addEventListener("change", function () {
+    formValidation(form.lastName.value,
+        '#' + form.lastName.id + 'ErrorMsg',
+        "Nom",
+        /^(?=.{3,40}$)[a-z]+(?:['_.\s][a-z]+)*$/i);
+});
+
+// listen for changes to input fields
+form.address.addEventListener("change", function () {
+    formValidation(form.address.value,
+        '#' + form.address.id + 'ErrorMsg',
+        "Adresse",
+        /^[a-zA-Z0-9\s,.'-]{3,}$/i);
+});
+
+// listen for changes to input fields
+form.city.addEventListener("change", function () {
+    formValidation(form.city.value,
+        '#' + form.city.id + 'ErrorMsg',
+        "Ville",
+        /^(?=.{3,40}$)[a-z]+(?:['_.\s][a-z]+)*$/i);
+});
+
+// listen for changes to input fields
+form.email.addEventListener("change", function () {
+    formValidation(form.email.value,
+        '#' + form.email.id + 'ErrorMsg',
+        "Email",
+        /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/i);
+});
+
+// listen to send of the command
+form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (formValidity) {
+        if (productId.length > 0) {
+            // TODO to order
+        } else {
+            alert('Votre panier est vide');
+        }
+    }
+});
+
+// checks the validity of the input
+function formValidation(textInput, id, text, RegExp) {
+    let msgError1 = "Veuillez renseigner votre ",
+        msgError2 = " n'est pas valide";
+
+    if (textInput === "") {
+        displayMsgError(msgError1 + text, id);
+        formValidity = false;
+
+    } else if (!RegExp.test(textInput)) {
+        displayMsgError(text + msgError2, id);
+        formValidity = false;
+
+    } else {
+        displayMsgError("", id);
+        formValidity = true;
+    }
+}
+
+// display error messages under inputs
+function displayMsgError(msg, id) {
+    document.querySelector(id).textContent = msg;
 }
