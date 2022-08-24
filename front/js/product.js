@@ -7,6 +7,7 @@ let productColorChoice,
     productName,
     productDescription;
 
+// fill the html page with the data
 const start =
     () => {
         // calls the API with the product ID and receives the data in json
@@ -14,6 +15,7 @@ const start =
             response.json().then((product) => {
 
                 for (let color of product.colors) {
+                        // introduces the elements in the html
                     productColorChoice += `<option value="${color}">${color}</option>`;
                 }
 

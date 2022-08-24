@@ -3,6 +3,7 @@ BASE_URL = `http://localhost:3000/api/products/`;
 // search ID items in the html
 let items = document.getElementById('items');
 
+// fill the html page with the data
 const start =
     () => {
         // calls the api and receives the data in json

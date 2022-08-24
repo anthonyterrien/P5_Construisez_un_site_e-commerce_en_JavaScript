@@ -8,6 +8,7 @@ let items = document.getElementById('cart__items'),
     formValidity = true,
     productId = [];
 
+// fill the html page with the data
 const start =
     async () => {
         // calls the local storage
@@ -124,6 +125,7 @@ function saveCart(cart) {
 async function priceProduct(productId) {
     let productPrice;
 
+    // calls the API with the product ID and receives the data in json
     await fetch(BASE_URL + productId).then((response) =>
         response.json().then((product) => {
             productPrice = product.price;
@@ -228,7 +230,7 @@ function displayMsgError(msg, id) {
 
 // send the command and the form to the API
 function toOrder() {
-    // set up data to send
+    // set up data
     const contact = {
         contact: {
             firstName: form.firstName.value,
@@ -239,7 +241,7 @@ function toOrder() {
         },
          products: productId,
     };
-    // send data
+    // send data to the API
     fetch(BASE_URL + 'order', {
         method: 'POST',
         body: JSON.stringify(contact),
