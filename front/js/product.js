@@ -47,23 +47,15 @@ document.getElementById("addToCart").addEventListener("click", function () {
             color = document.getElementById("colors").value,
             id = searchIdInUrl();
 
-        // check that there is more than 1 product selected
-        if (quantity >= 1) {
-                filterBeforeAddCart({
-                        "altTxt": productAltTxt,
-                        "color": color,
-                        "id": id,
-                        "imageUrl": productImage,
-                        "name": productName,
-                        "quantity": parseFloat(quantity)
-                });
-
-                // go to cart
-                window.location.assign("../html/cart.html");
-        } else {
-                // no quantity selected
-                console.log('no quantity selected');
-        }
+        // send data to filter
+        filterBeforeAddCart({
+            "altTxt": productAltTxt,
+            "color": color,
+            "id": id,
+            "imageUrl": productImage,
+            "name": productName,
+            "quantity": parseFloat(quantity)
+    });
 });
 
 // searches in the URL for the "id=" element and removes the three characters to have just ID
@@ -72,22 +64,63 @@ function searchIdInUrl() {
         return url.substring(url.lastIndexOf("id=") + 3);
 }
 
-// checks if the product already exists in the cart
+// filter before saving data
 function filterBeforeAddCart(product) {
-        // look at the cart and compare the ID and color with the selected product
-        let cart = getCart(),
-            foundProduct = cart.find(p => p.color === product.color, p => p.id === product.id),
-            quantity = 0;
-
-        // if the product is already in the cart add the quantities
-        if (foundProduct) {
+    // check that there is more than 1 product selected
+    if (product.quantity >= 1) {
+        // check that there are no more than one hundred products selected
+        if (product.quantity < 101) {
+            // look at the cart and compare the ID and color with the selected product
+            let cart = getCart(),
+                foundProduct = cart.find(p => p.color === product.color, p => p.id === product.id),
+                quantity = 0;
+            // if the product is already in the cart add the quantities
+            if (foundProduct) {
                 quantity = product.quantity;
-                foundProduct.quantity += quantity;
-                saveCart(cart);
-        } else {
+                // check the sum of two does not exceed hundred products
+                if ((foundProduct.quantity + quantity) < 101) {
+                    displayMsgError('')
+                    foundProduct.quantity += quantity;
+                    saveCart(cart);
+                    afterSaveOrAddCart();
+                } else {
+                    // send the error message
+                    displayMsgError('Vous ne pouvez pas ajouter plus de 100 article de ce modèle.');
+                }
+            } else {
                 // or else add product in cart
+                displayMsgError('')
                 addCart(product);
+                afterSaveOrAddCart();
+            }
+        } else {
+            // displays an error message
+            displayMsgError('Vous ne pouvez pas ajouter ' + product.quantity + ' article de ce modèle.');
         }
+    } else {
+        // displays an error message
+        displayMsgError('Vous devez sélèctionner au moin un article.');
+    }
+}
+
+// ask if you want to go to the cart
+function afterSaveOrAddCart() {
+    let isExecuted = confirm("Voulez-vous voir votre panier ?");
+    // if user confirm
+    if (isExecuted === true) {
+        window.location.assign("../html/cart.html");
+    } else {
+        // alert the user that the product has been added
+        alert("Votre article a bien été ajouté au panier")
+    }
+}
+
+// format and displays an error message
+function displayMsgError(msgError) {
+    document.querySelector(".item__content__settings__quantity").innerHTML
+        = `<label for="itemQuantity">Nombre d'article(s) (1-100) :</label>
+           <input type="number" name="itemQuantity" min="1" max="100" value="0" id="quantity">
+           <span style="color: #fbbcbc; display: flex" >${msgError}</span>`;
 }
 
 // get the products in the cart

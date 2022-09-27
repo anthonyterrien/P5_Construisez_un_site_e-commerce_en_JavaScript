@@ -65,8 +65,11 @@ function getElementsInCart() {
     for (let element of changeQtt) {
         // listen to the quantity change in a loop because multiple items in cart
         element.addEventListener("change", (e) => {
+            // check that there are no more than one hundred products selected
+            let lowerHundred = e.target.value <= 100;
             changeQuantity({
-                quantity: parseFloat(e.target.value),
+                // if there are more than one hundred show one hundred
+                quantity: lowerHundred ? parseFloat(e.target.value) : 100,
                 color: e.target.closest(".cart__item").dataset.color,
                 id: e.target.closest(".cart__item").dataset.id,
             });
