@@ -79,16 +79,11 @@ function getElementsInCart() {
     for (let element of deleteItem) {
         // listen item deletion in loop because multiple items in cart
         element.addEventListener("click", (e) => {
-            // message for user to confirm the deletion
-            let isExecuted = confirm("Voulez-vous supprimer cet article du panier ?");
-            // if user confirm
-            if (isExecuted === true) {
                 removeFromCart({
                     color: element.closest(".cart__item").dataset.color,
                     id: element.closest(".cart__item").dataset.id,
                     event: e,
                 });
-            }
         });
     }
 }
@@ -112,11 +107,16 @@ function changeQuantity(product) {
 
 // allows to delete an article
 function removeFromCart(product) {
-    let cart = getCart();
-    cart = cart.filter(p => p.color !== product.color, p => p.id !== product.id);
-    saveCart(cart);
-    refreshTotalPriceAndQtt()
-    product.event.target.closest("article").remove();
+    // message for user to confirm the deletion
+    let isExecuted = confirm("Voulez-vous supprimer cet article du panier ?");
+    // if user confirm
+    if (isExecuted === true) {
+        let cart = getCart();
+        cart = cart.filter(p => p.color !== product.color, p => p.id !== product.id);
+        saveCart(cart);
+        refreshTotalPriceAndQtt()
+        product.event.target.closest("article").remove();
+    }
 }
 
 // allows to save the changes in the local Storage
